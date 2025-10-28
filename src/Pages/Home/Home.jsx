@@ -8,8 +8,6 @@ import Booking from "../../Components/Booking/Booking.jsx";
 import Footer from "../../Components/Footer/Footer.jsx";
 import { Link } from "react-router-dom";
 
-// import principles from "/constants/index.js";
-
 const Home = () => {
   gsap.registerPlugin(ScrollTrigger);
 
@@ -134,8 +132,7 @@ const Home = () => {
     Runner.run(runner, engine);
 
     // --- ScrollTrigger: enable gravity when the services section top touches viewport top ---
-    const servicesSection =
-      sceneRef.current.closest(".services") || sceneRef.current;
+    const servicesSection = sceneRef.current.closest(".services") || sceneRef.current;
 
     let stInstance = null;
     if (servicesSection && ScrollTrigger) {
@@ -209,12 +206,12 @@ const Home = () => {
   return (
     <>
       {/* Header */}
-      <div className="min-h-screen max-w-6xl mx-auto">
+      <div className="min-h-[95vh] max-w-6xl mx-auto">
         <Navbar />
 
         <main className="mx-auto max-w-xl">
-          <section className="min-h-screen flex flex-col items-center justify-center text-center">
-            <h1 className="font-semibold text-5xl leading-[110%] mx-8">
+          <section className="min-h-[95vh] flex flex-col items-center justify-center text-center">
+            <h1 className="radio-canada-big font-semibold text-[56px] leading-[110%] mx-8">
               Transforming Ideas into Experiences
             </h1>
 
@@ -226,7 +223,7 @@ const Home = () => {
             <div className="mt-8">
               <a
                 href="#start"
-                className="inline-flex items-center justify-center w-64 h-14 rounded-md bg-black text-sm font-semibold text-white gap-2"
+                className="inline-flex items-center justify-center w-64 h-14 rounded-md bg-black text-sm font-bold leading-[120%] text-white gap-2"
               >
                 Let’s Create Together
               </a>
@@ -237,7 +234,7 @@ const Home = () => {
 
       {/* Projects */}
       <div className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-10">
+        <div className="mx-auto max-w-6xl px-4 pb-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projects.slice(0, 10).map((project, index) => (
             <article key={index} className="rounded-xl border border-black/10 bg-white">
@@ -254,9 +251,9 @@ const Home = () => {
                     </span>
                   </div>
                 </div>
-                <div className="mt-2 mx-2 flex items-center justify-between">
-                  <p className="text-sm font-medium text-black">{project.title}</p>
-                  <span className="text-sm text-black opacity-40">{project.year}</span>
+                <div className="mt-3 mb-1 mx-2 flex items-center justify-between">
+                  <p className="text-sm font-medium leading-[140%] text-black">{project.title}</p>
+                  <span className="text-sm text-black leading-[140%] opacity-40">{project.year}</span>
                 </div>
               </div>
             </article>
@@ -277,13 +274,13 @@ const Home = () => {
       {/* Services */}
       <div className="services bg-[#F3F3F2]">
         <div className="mx-auto max-w-6xl px-4 py-10">
-          <h2 className="text-2xl font-semibold text-black">What We do</h2>
+          <h2 className="text-2xl font-medium text-black">What We do</h2>
 
           <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* First animation */}
             <div className="relative rounded-xl bg-white p-8 min-h-[480px] flex flex-col justify-between overflow-hidden">
               <div className="pt-6 text-center">
-                <h3 className="text-3xl md:text-4xl text-black font-medium tracking-normal leading-normal">
+                <h3 className="radio-canada-big text-3xl md:text-4xl text-black font-medium tracking-normal leading-normal">
                   Brand Identity <br className="hidden sm:block" /> Design
                 </h3>
               </div>
@@ -325,7 +322,7 @@ const Home = () => {
             {/* Second animation */}
             <div className="rounded-xl bg-white p-8 min-h-[480px] flex flex-col justify-between relative overflow-hidden">
               <div className="pt-6 text-center">
-                <h3 className="text-3xl md:text-4xl text-black font-medium tracking-normal leading-normal">
+                <h3 className="radio-canada-big text-3xl md:text-4xl text-black font-medium tracking-normal leading-normal">
                   Experience Design & <br className="hidden sm:block" /> Development
                 </h3>
               </div>
@@ -363,7 +360,7 @@ const Home = () => {
 
       {/* Identity */}
       <div className="max-w-6xl mx-auto px-4 py-24 space-y-10">
-        <h3 className="text-2xl font-normal leading-normal mb-4">Who we are</h3>
+        <h3 className="text-2xl font-medium leading-normal mb-4">Who we are</h3>
         {/* Top section: Who we are */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-16">
           <div>
@@ -382,9 +379,9 @@ const Home = () => {
           <div className="border border-black rounded-lg overflow-hidden">
           <div className="divide-y divide-black">
             {identity.map((item, index) => (
-            <div key={index} className="group flex items-center px-6 py-5 hover:bg-black transition-colors duration-200 cursor-pointer">
-              <span className="text-4xl w-10 font-mono text-black group-hover:text-white">{index + 1}</span>
-              <span className="text-4xl font-medium ml-6 text-black group-hover:text-white">{item}</span>
+            <div key={index} className="group flex items-center px-6 py-5 hover:bg-black transition-colors duration-700">
+              <span className="geist-mono text-4xl w-10 font-mono text-black group-hover:text-white">0{index + 1}</span>
+              <span className="radio-canada-big text-4xl font-medium ml-6 text-black group-hover:text-white">{item}</span>
             </div>  
             ))}
           </div>

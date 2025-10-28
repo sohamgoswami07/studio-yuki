@@ -1,10 +1,33 @@
+/* Radio Canada Big (Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Radio+Canada+Big:ital,wght@0,400..700;1,400..700&display=swap');
+/* Geist Mono (Google Fonts) */
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap');
 @import "tailwindcss";
+
+/* Satoshi Font */
+@font-face {
+  font-family: "satoshi-font";
+  src: url('/Fonts/Satoshi/Satoshi-Regular.otf') format("opentype");
+  font-weight: normal;
+  font-style: medium;
+}
 
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: "satoshi-font";
   height: 100svh;
   width: 100dvw;
   overflow-x: hidden;
+}
+
+.radio-canada-big {
+  font-family: "Radio Canada Big", sans-serif;
+  font-optical-sizing: auto;
+}
+
+.geist-mono {
+  font-family: "Geist Mono", monospace;
+  font-optical-sizing: auto;
 }

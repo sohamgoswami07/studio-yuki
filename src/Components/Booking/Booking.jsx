@@ -7,7 +7,7 @@ const Booking = () => {
     {/* Booking */}
     <div className="bg-[#F3F3F2]">
     <div className="max-w-6xl mx-auto py-24 space-y-10">
-        <h3 className="text-[56px] font-semibold leading-tight tracking-tight mb-4 text-center">
+        <h3 className="radio-canada-big text-[56px] font-semibold leading-tight tracking-tight mb-4 text-center">
         We are the creative unit to partner with Brands that require distinctive creative experiences.
         </h3>
 
