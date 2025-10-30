@@ -1,396 +1,413 @@
-import React, { useEffect, useRef } from "react";
-import Matter from "matter-js";
+import React, { useEffect, useState, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { identity, projects } from "../../../public/constants/index.js";
+import { SplitText } from "gsap/SplitText";
+import { identity, projects, services, working_principle } from "../../../public/constants/index.js";
 import Navbar from "../../Components/Navbar/Navbar.jsx";
 import Booking from "../../Components/Booking/Booking.jsx";
 import Footer from "../../Components/Footer/Footer.jsx";
 import { Link } from "react-router-dom";
 
 const Home = () => {
-  gsap.registerPlugin(ScrollTrigger);
+  gsap.registerPlugin(ScrollTrigger, SplitText);
 
-  const sceneRef1 = useRef(null);
-  const sceneRef2 = useRef(null);
+  const headingRef = useRef(null);
+  const paragraphRef = useRef(null);
+  const buttonRef = useRef(null);
+  const bgTransitionRef = useRef(null);
 
-  const setupMatterScene = (sceneRef) => {
-    if (!sceneRef.current) return;
-
-    const { Engine, Render, Runner, World, Bodies, Body } = Matter;
-
-    const engine = Engine.create();
-    const world = engine.world;
-
-    // Start with gravity off
-    engine.gravity.y = 0;
-
-    const width = sceneRef.current.clientWidth;
-    const height = sceneRef.current.clientHeight;
-
-    const render = Render.create({
-      element: sceneRef.current,
-      engine: engine,
-      options: {
-        width,
-        height,
-        background: "#ffffff",
-        wireframes: false,
-      },
+  // allow multiple items to be open at once
+  const [openSet, setOpenSet] = useState(new Set());
+  const toggle = (i) => {
+    setOpenSet(prev => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
     });
+  };
 
-    // Ground + walls
-    const ground = Bodies.rectangle(width / 2, height + 20, width, 40, {
-      isStatic: true,
-      render: { fillStyle: "#ddd" },
+  // Helper to split into words and set initial styles
+  const prepareText = (el) => {
+    const split = new SplitText(el, { type: "words" });
+    gsap.set(split.words, {
+      yPercent: 60,
+      opacity: 0,
+      rotateX: 0,
+      transformOrigin: "0% 100%",
+      willChange: "transform, opacity",
     });
-    const leftWall = Bodies.rectangle(-20, height / 2, 40, height * 2, {
-      isStatic: true,
-      render: { visible: false },
-    });
-    const rightWall = Bodies.rectangle(width + 20, height / 2, 40, height * 2, {
-      isStatic: true,
-      render: { visible: false },
-    });
+    return split;
+  };
 
-    World.add(world, [ground, leftWall, rightWall]);
+  // Intro animations (heading, paragraph, button)
+  useEffect(() => {
+    if (!headingRef.current || !paragraphRef.current) return;
 
-    const spans = sceneRef.current.querySelectorAll("span");
-    const clones = [];
+    const runIntro = () => {
+      const hSplit = prepareText(headingRef.current);
+      const pSplit = prepareText(paragraphRef.current);
+      const buttonEl = buttonRef.current.querySelector("a");
 
-    spans.forEach((span) => {
-      const rect = span.getBoundingClientRect();
-      const computedStyle = window.getComputedStyle(span);
+      const tl = gsap.timeline();
 
-      const backgroundColor = computedStyle.backgroundColor || "#ccc";
-      const textColor = computedStyle.color || "#000";
-      const borderRadius = computedStyle.borderRadius || "30px";
+      // Heading words
+      tl.to(hSplit.words, {
+          yPercent: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 0.8,
+          stagger: 0.1,
+          ease: "back.out(1.5)",
+        }, "1.35")
+        // Paragraph words
+        .to(pSplit.words, {
+            yPercent: 0,
+            opacity: 1,
+            rotateX: 0,
+            duration: 0.6,
+            stagger: 0.05,
+            ease: "back.out(1.5)",
+          }, "1.35");
 
-      const x = Math.random() * (width - 100) + 50;
-      const y = Math.random() * -200 - 250;
-      const body = Bodies.rectangle(x, y, rect.width, rect.height, {
-        restitution: 0.3,
-        render: { fillStyle: backgroundColor },
+      // Button: reserve space and animate inner anchor without reflow
+      gsap.set(buttonEl, {
+        scaleY: 0,
+        opacity: 0,
+        y: 14, // subtle rise
+        transformOrigin: "50% 100%",
+        willChange: "transform, opacity",
       });
 
-      World.add(world, body);
+      tl.to(buttonEl, {
+          scaleY: 1,
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "back.out(1.5)",
+          clearProps: "willChange",
+        }, "-=0.05");
 
-      const floatingSpan = span.cloneNode(true);
-      floatingSpan.style.position = "absolute";
-      floatingSpan.style.left = "0";
-      floatingSpan.style.top = "0";
-      floatingSpan.style.color = textColor;
-      floatingSpan.style.backgroundColor = backgroundColor;
-      floatingSpan.style.pointerEvents = "none";
-      floatingSpan.style.transformOrigin = "center";
-      floatingSpan.style.width = `${rect.width}px`;
-      floatingSpan.style.height = `${rect.height}px`;
-      floatingSpan.style.display = "inline-flex";
-      floatingSpan.style.borderRadius = borderRadius;
-      floatingSpan.style.alignItems = "center";
-      floatingSpan.style.justifyContent = "center";
-      floatingSpan.style.boxSizing = "border-box";
-
-      sceneRef.current.appendChild(floatingSpan);
-      span.style.opacity = "0";
-      clones.push({ body, cloneEl: floatingSpan, rect });
-    });
-
-    const canvas = render.canvas;
-    const sceneEl = sceneRef.current;
-
-    const getCanvasOffset = () => {
-      const sceneRect = sceneEl.getBoundingClientRect();
-      const canvasRect = canvas.getBoundingClientRect();
-      return {
-        left: canvasRect.left - sceneRect.left,
-        top: canvasRect.top - sceneRect.top,
+      return () => {
+        tl.kill();
+        hSplit.revert();
+        pSplit.revert();
       };
     };
 
-    let canvasOffset = getCanvasOffset();
-    const handleRecalcOffset = () => {
-      canvasOffset = getCanvasOffset();
-    };
-    window.addEventListener("resize", handleRecalcOffset);
-    window.addEventListener("scroll", handleRecalcOffset, { passive: true });
+    let cleanup = null;
+    let ran = false;
 
-    let rafId = null;
-    const updateAll = () => {
-      const { left: canvasLeft, top: canvasTop } = canvasOffset;
-      clones.forEach(({ body, cloneEl, rect }) => {
-        const { x, y } = body.position;
-        const px = x - rect.width / 2 + canvasLeft;
-        const py = y - rect.height / 2 + canvasTop;
-        cloneEl.style.transform = `translate(${px}px, ${py}px) rotate(${body.angle}rad)`;
+    const startNow = () => {
+      if (ran) return;
+      ran = true;
+      document.fonts.ready.then(() => {
+        cleanup = runIntro();
       });
-      rafId = requestAnimationFrame(updateAll);
     };
-    updateAll();
 
-    const runner = Runner.create();
-    Runner.run(runner, engine);
+    const onPreloaderDone = () => startNow();
 
-    // --- ScrollTrigger: enable gravity when the services section top touches viewport top ---
-    const servicesSection = sceneRef.current.closest(".services") || sceneRef.current;
-
-    let stInstance = null;
-    if (servicesSection && ScrollTrigger) {
-      stInstance = ScrollTrigger.create({
-        trigger: servicesSection,
-        start: "top top", // when the top of the services section hits the top of the viewport
-        onEnter: () => {
-          // turn gravity on
-          engine.gravity.y = 1; // tweak this for stronger/weaker gravity
-
-          // give a small initial nudge so objects break free
-          clones.forEach(({ body }) => {
-            Body.applyForce(body, body.position, { x: 0, y: 0.0025 });
-          });
-        },
-        onEnterBack: () => {
-          engine.gravity.y = 1;
-          clones.forEach(({ body }) => {
-            Body.applyForce(body, body.position, { x: 0, y: 0.0015 });
-          });
-        },
-        onLeave: () => {
-          // optional: when the user scrolls past the section, you may want to pause gravity
-          engine.gravity.y = 0;
-        },
-        onLeaveBack: () => {
-          // when user scrolls back above the section, turn gravity off again
-          engine.gravity.y = 0;
-        },
-        // markers: true, // uncomment if you want to debug trigger positions
+    // Prefer the custom preloader event if you emit it; else start on next frame.
+    window.addEventListener("preloader:done", onPreloaderDone, { once: true });
+    requestAnimationFrame(() => {
+      document.fonts.ready.then(() => {
+        cleanup = runIntro();
       });
-    }
+    });
 
     return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      window.removeEventListener("resize", handleRecalcOffset);
-      window.removeEventListener("scroll", handleRecalcOffset);
-
-      Render.stop(render);
-      Runner.stop(runner);
-      Engine.clear(engine);
-      World.clear(world, false);
-
-      if (render.canvas && render.canvas.remove) render.canvas.remove();
-      render.textures = {};
-
-      clones.forEach(({ cloneEl }) => cloneEl.remove());
-
-      if (stInstance) {
-        stInstance.kill();
-        // also clear any ScrollTrigger-related internals if necessary
-        try {
-          ScrollTrigger.clear();
-        } catch (e) {
-          /* ignore */
-        }
-      }
+      window.removeEventListener("preloader:done", onPreloaderDone);
+      if (cleanup) cleanup();
     };
-  };
+  }, []);
 
+  // Scroll-triggered dark mode at the exact center alignment
   useEffect(() => {
-    const cleanup1 = setupMatterScene(sceneRef1);
-    const cleanup2 = setupMatterScene(sceneRef2);
+    if (!bgTransitionRef.current) return;
+
+    // 1) Page background & default text color
+    const bodyTween = gsap.to(".overlay-transition", {
+      backgroundColor: "#000000",
+      color: "#ffffff",
+      duration: 0.5,
+      // delay: 0.2,
+      ease: "power3.inOut",
+      scrollTrigger: {
+        trigger: bgTransitionRef.current,
+        start: "start center",
+        toggleActions: "play none none reverse",
+      },
+    });
+
+    // 2) Explicit text classes → ensure they turn white too
+    const textTween = gsap.to(
+      [
+        ".heading-transition",
+        ".big-text-transition",
+        ".body-text-transition",
+        ".small-text-transition",
+      ],
+      {
+        color: "#ffffff",
+        duration: 0.5,
+        ease: "power3.inOut",
+        scrollTrigger: {
+          trigger: bgTransitionRef.current,
+          start: "start center",
+          toggleActions: "play none none reverse",
+        },
+      }
+    );
+
+    // 3) Buttons invert for contrast
+    const buttonTween = gsap.to(".button", {
+      backgroundColor: "#000000",
+      color: "#ffffff",
+      borderColor: "#ffffff",
+      duration: 0.5,
+      ease: "power3.inOut",
+      scrollTrigger: {
+        trigger: bgTransitionRef.current,
+        start: "start center",
+        toggleActions: "play none none reverse",
+      },
+    });
+
+    // 4) Borders to white (Tailwind ".border" utilities)
+    const borderTween = gsap.to(".border", {
+      borderColor: "#ffffff",
+      duration: 0.5,
+      ease: "power3.inOut",
+      scrollTrigger: {
+        trigger: bgTransitionRef.current,
+        start: "start center",
+        toggleActions: "play none none reverse",
+      },
+    });
+
+    // 5) Divider lines (.divide-y) – force children borders to white too
+    const divideTween = gsap.to(".divide-y", {
+      borderColor: "#ffffff",
+      duration: 0.5,
+      ease: "power3.inOut",
+      scrollTrigger: {
+        trigger: bgTransitionRef.current,
+        start: "start center",
+        toggleActions: "play none none reverse",
+      },
+    });
+
     return () => {
-      if (cleanup1) cleanup1();
-      if (cleanup2) cleanup2();
+      [bodyTween, textTween, buttonTween, borderTween, divideTween].forEach(t => {
+        t?.scrollTrigger?.kill();
+        t?.kill();
+      });
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
-      {/* Header */}
-      <div className="min-h-[95vh] max-w-6xl mx-auto">
-        <Navbar />
+      <div className="overlay-transition">
+        {/* Header */}
+        <div className="min-h-[95vh] max-w-6xl mx-auto">
+          <Navbar />
 
-        <main className="mx-auto max-w-xl">
-          <section className="min-h-[95vh] flex flex-col items-center justify-center text-center">
-            <h1 className="radio-canada-big font-semibold text-[56px] leading-[110%] mx-8">
-              Transforming Ideas into Experiences
-            </h1>
+          <main className="mx-auto max-w-xl">
+            <section className="min-h-[95vh] flex flex-col items-center justify-center text-center">
+              <h1 ref={headingRef} className="radio-canada-big heading heading-transition mx-8">
+                Transforming Ideas into Experiences
+              </h1>
 
-            <p className="mt-6 text-lg leading-[135%]">
-              We are a design studio blending story, interaction, and technology to
-              shape brand experiences that move users.
-            </p>
+              <p ref={paragraphRef} className="mt-6 body-text body-text-transition">
+                We are a design studio blending story, interaction, and technology to
+                shape brand experiences that move users.
+              </p>
 
-            <div className="mt-8">
-              <a
-                href="#start"
-                className="inline-flex items-center justify-center w-64 h-14 rounded-md bg-black text-sm font-bold leading-[120%] text-white gap-2"
-              >
-                Let’s Create Together
-              </a>
-            </div>
-          </section>
-        </main>
-      </div>
+              <div ref={buttonRef} className="mt-8 h-14">
+                <a
+                  href="#start"
+                  className="inline-flex items-center justify-center w-64 h-14 rounded-md bg-black button button-text text-white gap-2"
+                >
+                  Let’s Create Together
+                </a>
+              </div>
+            </section>
+          </main>
+        </div>
 
-      {/* Projects */}
-      <div className="bg-white">
+        {/* Projects */}
         <div className="mx-auto max-w-6xl px-4 pb-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projects.slice(0, 10).map((project, index) => (
-            <article key={index} className="rounded-xl border border-black/10 bg-white">
-              <div className="p-2">
-                <div className="relative overflow-hidden rounded-lg">
-                  <img
-                    src={project.vdo}
-                    alt="Project cover"
-                    className="h-auto w-full object-cover aspect-[16/9] rounded-lg"
-                  />
-                  <div className="absolute bottom-2 right-2">
-                    <span className="inline-flex items-center rounded-full bg-white/90 backdrop-blur px-2.5 py-1 text-xs font-medium text-gray-900 ring-1 ring-black/10">
-                      Client: Placeholder
-                    </span>
+              <a href={project.src} key={index} className="rounded-xl border border-black/10 bg-transparent">
+                <div className="p-2">
+                  <div className="relative overflow-hidden rounded-lg">
+                    <img
+                      src={project.vdo}
+                      alt="Project cover"
+                      className="h-auto w-full object-cover aspect-[16/9] rounded-lg"
+                    />
+                    <div className="absolute bottom-2 right-2">
+                      <span className="inline-flex items-center rounded-full bg-white/90 backdrop-blur px-2.5 py-1 text-xs font-medium text-gray-900 ring-1 ring-black/10">
+                        Client: Placeholder
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-3 mb-1 mx-2 flex items-center justify-between">
+                    <p className="small-text small-text-transition">{project.title}</p>
+                    <span className="small-text small-text-transition opacity-40">{project.year}</span>
                   </div>
                 </div>
-                <div className="mt-3 mb-1 mx-2 flex items-center justify-between">
-                  <p className="text-sm font-medium leading-[140%] text-black">{project.title}</p>
-                  <span className="text-sm text-black leading-[140%] opacity-40">{project.year}</span>
-                </div>
-              </div>
-            </article>
+              </a>
             ))}
           </div>
           <div className="mt-8 flex justify-center">
             <Link
               to="/playground"
               type="button"
-              className="inline-flex items-center justify-center w-64 h-14 rounded-md text-black border border-black bg-white text-sm font-semibold gap-2"
+              className="inline-flex items-center justify-center w-64 h-14 rounded-md button button-text border border-black bg-white gap-2"
             >
               View More
             </Link>
           </div>
         </div>
-      </div>
 
-      {/* Services */}
-      <div className="services bg-[#F3F3F2]">
-        <div className="mx-auto max-w-6xl px-4 py-10">
-          <h2 className="text-2xl font-medium text-black">What We do</h2>
+        {/* Services */}
+        <div ref={bgTransitionRef} className="max-w-6xl mx-auto px-4 py-24 space-y-10">
+          <h2 className="lead-paragraph text-[#FF4C1B] mb-4">Who we are</h2>
+          {/* List section */}
+          <section>
+            <div className="border border-black rounded-lg overflow-hidden">
+              {/* keep dividers between rows */}
+              <div className="divide-y">
+                {services.map((item, index) => {
+                  const isOpen = openSet.has(index);
+                  return (
+                    <div
+                      key={index}
+                      className="transition-all duration-500 overflow-hidden"
+                    >
+                      {/* Clickable header row */}
+                      <div
+                        onClick={() => toggle(index)}
+                        className="group flex items-center px-6 py-5 cursor-pointer select-none"
+                        role="button"
+                        aria-expanded={isOpen}
+                        aria-controls={`service-panel-${index}`}
+                      >
+                        <span
+                          className="geist-mono text-4xl w-10 font-mono transition-transform duration-300"
+                        >
+                          {isOpen ? "−" : "+"}
+                        </span>
+                        <span
+                          className="radio-canada-big text-4xl font-medium ml-6 transition-colors duration-300"
+                        >
+                          {item.title}
+                        </span>
+                      </div>
 
-          <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* First animation */}
-            <div className="relative rounded-xl bg-white p-8 min-h-[480px] flex flex-col justify-between overflow-hidden">
-              <div className="pt-6 text-center">
-                <h3 className="radio-canada-big text-3xl md:text-4xl text-black font-medium tracking-normal leading-normal">
-                  Brand Identity <br className="hidden sm:block" /> Design
-                </h3>
-              </div>
+                      {/* Expanding panel */}
+                      <div
+                        id={`service-panel-${index}`}
+                        role="region"
+                        aria-hidden={!isOpen}
+                        className={`grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-10 items-start
+                                    px-6 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
+                                    ${isOpen ? "max-h-72 opacity-100 py-4" : "max-h-0 opacity-0 py-0"}`}
+                      >
+                        <p className="body-text body-text-transition">
+                          We craft meaningful experiences that unite strategy, story & design —
+                          inspiring connection and driving growth.
+                        </p>
 
-              <div
-                ref={sceneRef1}
-                className="relative pt-8 flex flex-wrap gap-3 overflow-hidden"
-              >
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-gray-100 text-black">
-                  Visual Identity
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-gray-100 text-black">
-                  Brand Strategy
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-[#a4c3bf] text-black">
-                  Brand Voice
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-gray-100 text-black">
-                  Copywriting
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-[#e7e7de] text-black">
-                  Iconography
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-gray-100 text-black">
-                  Illustration
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-[#cfe1ff] text-black">
-                  Logo
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-[#d8b4b6] text-black">
-                  3D
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-[#b5a6c9] text-black">
-                  Animation
-                </span>
-              </div>
-            </div>
-
-            {/* Second animation */}
-            <div className="rounded-xl bg-white p-8 min-h-[480px] flex flex-col justify-between relative overflow-hidden">
-              <div className="pt-6 text-center">
-                <h3 className="radio-canada-big text-3xl md:text-4xl text-black font-medium tracking-normal leading-normal">
-                  Experience Design & <br className="hidden sm:block" /> Development
-                </h3>
-              </div>
-
-              <div
-                ref={sceneRef2}
-                className="relative pt-8 flex flex-wrap gap-3 overflow-hidden"
-              >
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-gray-100 text-black">
-                  Website
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-gray-100 text-black">
-                  Landing Page
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-[#a4c3bf] text-black">
-                  E-commerce
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-gray-100 text-black">
-                  Microsite
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-[#e7e7de] text-black">
-                  Marketing sites
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-gray-100 text-black">
-                  CMS
-                </span>
-                <span className="px-3 py-2 text-xs font-normal rounded-full bg-[#cfe1ff] text-black">
-                  Framer Development
-                </span>
+                        <ul className="list-disc body-text body-text-transition pb-4">
+                          {item.bullets.map((it) => (
+                            <li key={it}>{it}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
+          </section>
         </div>
-      </div>
 
-      {/* Identity */}
-      <div className="max-w-6xl mx-auto px-4 py-24 space-y-10">
-        <h3 className="text-2xl font-medium leading-normal mb-4">Who we are</h3>
-        {/* Top section: Who we are */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          <div>
-            <p className="leading-tight text-black">We craft meaningful experiences that unite strategy, story & design — inspiring connection and driving growth.</p>
-          </div>
-          <div>
-            <p className="leading-tight text-black">We work closely with ambitious teams to translate vision into experiences — built with care, crafted for performance.</p>
-          </div>
-          <div>
-            <p className="leading-tight text-black">Every project begins as a conversation — shaped by collaboration, driven by craft, and accelerated by the energy to make ideas real.</p>
-          </div>
-        </section>
+        {/* Working principle */}
+        <div className="max-w-6xl mx-auto px-4 py-24 space-y-10">
+          <h2 className="lead-paragraph text-[#FF4C1B] mb-4">How we do</h2>
+          
+          {/* Upper section: Illustration */}
+          <section></section>
 
-        {/* List section */}
-        <section>
-          <div className="border border-black rounded-lg overflow-hidden">
-          <div className="divide-y divide-black">
-            {identity.map((item, index) => (
-            <div key={index} className="group flex items-center px-6 py-5 hover:bg-black transition-colors duration-700">
-              <span className="geist-mono text-4xl w-10 font-mono text-black group-hover:text-white">0{index + 1}</span>
-              <span className="radio-canada-big text-4xl font-medium ml-6 text-black group-hover:text-white">{item}</span>
-            </div>  
+          {/* Bottom section: Working principle */}
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {working_principle.map((principle, index) => (
+              <div key={index}>
+                <div className="flex py-4">
+                  <h2 className="big-text big-text-transition">
+                    <span className="geist-mono font-light">0{index + 1}</span>
+                    <span className="radio-canada big-text font-bold pl-4">{principle.title}</span>
+                  </h2>
+                </div>
+
+                <p className="body-text body-text-transition">
+                  {principle.description}
+                </p>
+              </div>
             ))}
-          </div>
-          </div>
-        </section>
-      </div>
+          </section>
+        </div>
 
-      <Booking />
-      <Footer />
+        {/* Identity */}
+        <div className="max-w-6xl mx-auto px-4 py-24 space-y-10">
+          <h2 className="lead-paragraph text-[#FF4C1B] mb-4">Who we are</h2>
+          {/* Top section: Who we are */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-16">
+            <div>
+              <p className="body-text body-text-transition text-black">
+                We craft meaningful experiences that unite strategy, story & design — inspiring connection and driving growth.
+              </p>
+            </div>
+            <div>
+              <p className="body-text body-text-transition text-black">
+                We work closely with ambitious teams to translate vision into experiences — built with care, crafted for performance.
+              </p>
+            </div>
+            <div>
+              <p className="body-text body-text-transition text-black">
+                Every project begins as a conversation — shaped by collaboration, driven by craft, and accelerated by the energy to make ideas real.
+              </p>
+            </div>
+          </section>
+
+          {/* List section */}
+          <section>
+            <div className="border border-black rounded-lg overflow-hidden">
+              <div className="divide-y">
+                {identity.map((item, index) => (
+                  <div
+                    key={index}
+                    className="group flex items-center px-6 py-5"
+                  >
+                    <span className="geist-mono big-text big-text-transition font-light w-10">
+                      0{index + 1}
+                    </span>
+                    <span className="radio-canada-big big-text big-text-transition font-medium ml-6">
+                      {item}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <Booking />
+        <Footer />
+      </div>
     </>
   );
 };

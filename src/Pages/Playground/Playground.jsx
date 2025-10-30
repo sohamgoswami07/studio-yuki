@@ -12,10 +12,10 @@ const Playground = () => {
 
     {/* All projects */}
     <div className="bg-white">
-      <div className="mx-auto max-w-6xl px-4 my-28">
+      <div className="mx-auto max-w-6xl px-4 py-28">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects.map((project, index) => (
-          <article key={index} className="rounded-xl border border-black/10 bg-white">
+          <a href={project.src} key={index} className="rounded-xl border border-black/10 bg-white">
             <div className="p-2">
               <div className="relative overflow-hidden rounded-lg">
                 <img
@@ -34,7 +34,7 @@ const Playground = () => {
                 <span className="text-sm text-black opacity-40">{project.year}</span>
               </div>
             </div>
-          </article>
+          </a>
           ))}
         </div>
       </div>

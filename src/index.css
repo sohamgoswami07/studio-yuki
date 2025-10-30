@@ -6,17 +6,17 @@
 
 /* Satoshi Font */
 @font-face {
-  font-family: "satoshi-font";
+  font-family: "Satoshi";
   src: url('/Fonts/Satoshi/Satoshi-Regular.otf') format("opentype");
   font-weight: normal;
-  font-style: medium;
+  font-display: swap;
 }
 
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "satoshi-font";
+  font-family: "Satoshi";
   height: 100svh;
   width: 100dvw;
   overflow-x: hidden;
@@ -25,9 +25,37 @@ body {
 .radio-canada-big {
   font-family: "Radio Canada Big", sans-serif;
   font-optical-sizing: auto;
+  font-display: swap;
 }
 
 .geist-mono {
   font-family: "Geist Mono", monospace;
   font-optical-sizing: auto;
+  font-display: swap;
+}
+
+@layer utilities {
+  .heading {
+    @apply font-semibold text-[32px] md:text-[56px] leading-[120%] md:leading-[110%];
+  }
+
+  .big-text {
+    @apply text-[22px] md:text-[36px] leading-[130%] md:leading-[120%];
+  }
+
+  .lead-paragraph {
+    @apply text-lg md:text-[22px] font-medium leading-[150%];
+  }
+
+  .body-text {
+    @apply text-base md:text-lg font-medium leading-[130%] md:leading-[135%];
+  }
+
+  .small-text {
+    @apply text-sm font-medium leading-[140%];
+  }
+
+  .button-text {
+    @apply text-sm font-bold leading-[120%];
+  }
 }

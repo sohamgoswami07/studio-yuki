@@ -5,9 +5,9 @@ const Booking = () => {
   return (
     <>
     {/* Booking */}
-    <div className="bg-[#F3F3F2]">
+    <div className="bg-[#FF4C1B]">
     <div className="max-w-6xl mx-auto py-24 space-y-10">
-        <h3 className="radio-canada-big text-[56px] font-semibold leading-tight tracking-tight mb-4 text-center">
+        <h3 className="radio-canada-big heading mb-4 text-center text-black">
         We are the creative unit to partner with Brands that require distinctive creative experiences.
         </h3>
 
@@ -16,11 +16,9 @@ const Booking = () => {
         
         </section>
 
-        {/* Social media links */}
+        {/* Email link */}
         <div className="flex gap-4 justify-center text-center">
-        {socialLinks.map((link, index) => (
-            <a key={index} href={link.link} className="text-sm font-bold">{link.name}</a>
-        ))}
+          <a className='radio-canada-big big-text text-black underline' href="hi@studioyuki.com">hi@studioyuki.com</a>
         </div>
     </div>
     </div>
