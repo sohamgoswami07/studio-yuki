@@ -4,7 +4,7 @@ import { socialLinks } from "../../../public/constants/index.js";
 const Footer = () => {
   return (
     <>
-    <div className="bg-[#FF4C1B]">
+    <div className="bg-[#FF4C1B]" data-section="footer">
       <div>
         <h1>Footer</h1>
       </div>

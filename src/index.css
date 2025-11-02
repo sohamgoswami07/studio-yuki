@@ -12,9 +12,15 @@
   font-display: swap;
 }
 
+* {
+  cursor: none !important;
+}
+
 body {
   margin: 0;
   padding: 0;
+  background-color: #ffffff;
+  color: #000000;
   box-sizing: border-box;
   font-family: "Satoshi";
   height: 100svh;

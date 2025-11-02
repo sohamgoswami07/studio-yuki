@@ -239,7 +239,7 @@ const Home = () => {
         <div className="mx-auto max-w-6xl px-4 pb-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projects.slice(0, 10).map((project, index) => (
-              <a href={project.src} key={index} className="rounded-xl border border-black/10 bg-transparent">
+              <a href={project.src} key={index} data-cursor="project" className="rounded-xl border border-black/10 bg-transparent">
                 <div className="p-2">
                   <div className="relative overflow-hidden rounded-lg">
                     <img

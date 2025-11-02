@@ -39,7 +39,7 @@ const Preloader = () => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-100 flex items-center justify-center bg-[#FF4C1B] overflow-hidden"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#FF4C1B] overflow-hidden"
     >
       {/* Expanding white circle */}
       <div

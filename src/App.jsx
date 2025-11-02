@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import Home from "./Pages/Home/Home";
 import Playground from "./Pages/Playground/Playground";
 import Preloader from "./Components/Preloader/Preloader";
+import Cursor from "./Components/Cursor/Cursor";
 
 function App() {
   const lenisRef = useRef();
@@ -21,6 +22,7 @@ function App() {
   return (
     <>
       <Preloader />
+      <Cursor />
       <ReactLenis root options={{ autoRaf: false }} ref={lenisRef} />
       <Routes>
         <Route path="/" element={<Home />} />
