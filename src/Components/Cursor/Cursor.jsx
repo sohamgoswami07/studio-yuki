@@ -35,7 +35,7 @@ const Cursor = () => {
       }
 
       // NEW: find the nearest element that defines a cursor label
-      const labeled = el?.closest("[data-cursor]");
+      const labeled = el?.closest("[data-section]");
       setLabel(labeled ? "view" : "");
     };
 
@@ -44,7 +44,7 @@ const Cursor = () => {
 
     const onPointerOver = (e) => {
       const el = e.target;
-      const isHover = el.closest("a, button, [role='button'], [data-cursor]") != null;
+      const isHover = el.closest("a, button, [role='button'], [data-section]") != null;
       setHovering(isHover);
     };
 
