@@ -46,7 +46,7 @@ body {
   }
 
   .big-text {
-    @apply text-[22px] md:text-[36px] leading-[130%] md:leading-[120%];
+    @apply text-[22px] md:text-[36px] leading-[130%] md:leading-[120%]
   }
 
   .lead-paragraph {

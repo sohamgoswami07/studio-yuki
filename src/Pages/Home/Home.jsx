@@ -17,13 +17,9 @@ const Home = () => {
   const bgTransitionRef = useRef(null);
 
   // allow multiple items to be open at once
-  const [openSet, setOpenSet] = useState(new Set());
+  const [openIndex, setOpenIndex] = useState(null);
   const toggle = (i) => {
-    setOpenSet(prev => {
-      const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
-      return next;
-    });
+    setOpenIndex(prev => (prev === i ? null : i));
   };
 
   // Helper to split into words and set initial styles
@@ -129,9 +125,9 @@ const Home = () => {
     const bodyTween = gsap.to(".overlay-transition", {
       backgroundColor: "#000000",
       color: "#ffffff",
-      duration: 0.5,
+      duration: 0.2,
       // delay: 0.2,
-      ease: "power3.inOut",
+      ease: "power1.inOut",
       scrollTrigger: {
         trigger: bgTransitionRef.current,
         start: "start center",
@@ -149,8 +145,8 @@ const Home = () => {
       ],
       {
         color: "#ffffff",
-        duration: 0.5,
-        ease: "power3.inOut",
+        duration: 0.2,
+        ease: "power1.inOut",
         scrollTrigger: {
           trigger: bgTransitionRef.current,
           start: "start center",
@@ -164,8 +160,8 @@ const Home = () => {
       backgroundColor: "#000000",
       color: "#ffffff",
       borderColor: "#ffffff",
-      duration: 0.5,
-      ease: "power3.inOut",
+      duration: 0.2,
+      ease: "power1.inOut",
       scrollTrigger: {
         trigger: bgTransitionRef.current,
         start: "start center",
@@ -176,8 +172,8 @@ const Home = () => {
     // 4) Borders to white (Tailwind ".border" utilities)
     const borderTween = gsap.to(".border", {
       borderColor: "#ffffff",
-      duration: 0.5,
-      ease: "power3.inOut",
+      duration: 0.2,
+      ease: "power1.inOut",
       scrollTrigger: {
         trigger: bgTransitionRef.current,
         start: "start center",
@@ -188,8 +184,8 @@ const Home = () => {
     // 5) Divider lines (.divide-y) – force children borders to white too
     const divideTween = gsap.to(".divide-y", {
       borderColor: "#ffffff",
-      duration: 0.5,
-      ease: "power3.inOut",
+      duration: 0.2,
+      ease: "power1.inOut",
       scrollTrigger: {
         trigger: bgTransitionRef.current,
         start: "start center",
@@ -224,12 +220,12 @@ const Home = () => {
               </p>
 
               <div ref={buttonRef} className="mt-8 h-14">
-                <a
-                  href="#start"
-                  className="inline-flex items-center justify-center w-64 h-14 rounded-md bg-black button button-text text-white gap-2"
+                <Link
+                  to="https://cal.com/ranitdas/30min?overlayCalendar=true"
+                  className="relative z-30 inline-flex items-center justify-center w-64 h-14 rounded-md bg-black button button-text text-white gap-2"
                 >
                   Let’s Create Together
-                </a>
+                </Link>
               </div>
             </section>
           </main>
@@ -239,7 +235,7 @@ const Home = () => {
         <div className="mx-auto max-w-6xl px-4 pb-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projects.slice(0, 10).map((project, index) => (
-              <a href={project.src} key={index} data-section="project" className="rounded-xl border border-black/10 bg-transparent">
+              <a href={project.src} key={index} className="rounded-xl border border-black/10 bg-transparent">
                 <div className="p-2">
                   <div className="relative overflow-hidden rounded-lg">
                     <img
@@ -265,7 +261,7 @@ const Home = () => {
             <Link
               to="/playground"
               type="button"
-              className="inline-flex items-center justify-center w-64 h-14 rounded-md button button-text border border-black bg-white gap-2"
+              className="relative z-30 inline-flex items-center justify-center w-64 h-14 rounded-md button button-text border border-black bg-white gap-2"
             >
               View More
             </Link>
@@ -274,14 +270,14 @@ const Home = () => {
 
         {/* Services */}
         <div ref={bgTransitionRef} className="max-w-6xl mx-auto px-4 py-24 space-y-10">
-          <h2 className="lead-paragraph text-[#FF4C1B] mb-4">Who we are</h2>
+          <h2 className="lead-paragraph text-[#FF4C1B] mb-4">What we are</h2>
           {/* List section */}
           <section>
             <div className="border border-black rounded-lg overflow-hidden">
               {/* keep dividers between rows */}
               <div className="divide-y">
                 {services.map((item, index) => {
-                  const isOpen = openSet.has(index);
+                  const isOpen = openIndex === index;
                   return (
                     <div
                       key={index}
@@ -290,7 +286,7 @@ const Home = () => {
                       {/* Clickable header row */}
                       <div
                         onClick={() => toggle(index)}
-                        className="group flex items-center px-6 py-5 cursor-pointer select-none"
+                        className="relative z-30 group flex items-center px-6 py-5 cursor-pointer select-none"
                         role="button"
                         aria-expanded={isOpen}
                         aria-controls={`service-panel-${index}`}
@@ -301,7 +297,7 @@ const Home = () => {
                           {isOpen ? "−" : "+"}
                         </span>
                         <span
-                          className="radio-canada-big text-4xl font-medium ml-6 transition-colors duration-300"
+                          className="radio-canada-big big-text ml-6 transition-colors duration-300"
                         >
                           {item.title}
                         </span>
@@ -316,10 +312,11 @@ const Home = () => {
                                     px-6 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]
                                     ${isOpen ? "max-h-72 opacity-100 py-4" : "max-h-0 opacity-0 py-0"}`}
                       >
-                        <p className="body-text body-text-transition">
-                          We craft meaningful experiences that unite strategy, story & design —
-                          inspiring connection and driving growth.
-                        </p>
+                        {item.paragraph && (
+                          <p className="body-text body-text-transition">
+                            {item.paragraph}
+                          </p>
+                        )}
 
                         <ul className="list-disc body-text body-text-transition pb-4">
                           {item.bullets.map((it) => (
@@ -353,7 +350,7 @@ const Home = () => {
                   </h2>
                 </div>
 
-                <p className="body-text body-text-transition">
+                <p className="body-text body-text-transition opacity-80">
                   {principle.description}
                 </p>
               </div>
@@ -367,17 +364,17 @@ const Home = () => {
           {/* Top section: Who we are */}
           <section className="grid grid-cols-1 md:grid-cols-3 gap-16">
             <div>
-              <p className="body-text body-text-transition text-black">
+              <p className="body-text body-text-transition text-black opacity-80">
                 We craft meaningful experiences that unite strategy, story & design — inspiring connection and driving growth.
               </p>
             </div>
             <div>
-              <p className="body-text body-text-transition text-black">
+              <p className="body-text body-text-transition text-black opacity-80">
                 We work closely with ambitious teams to translate vision into experiences — built with care, crafted for performance.
               </p>
             </div>
             <div>
-              <p className="body-text body-text-transition text-black">
+              <p className="body-text body-text-transition text-black opacity-80">
                 Every project begins as a conversation — shaped by collaboration, driven by craft, and accelerated by the energy to make ideas real.
               </p>
             </div>
