@@ -102,14 +102,6 @@ const Footer = () => {
                 transformStyle: 'preserve-3d',
                 willChange: 'transform',
               }}
-              // onMouseMove={(e) => {
-              //   // pass mouse position to CSS var for glow center
-              //   const rect = e.currentTarget.getBoundingClientRect();
-              //   const mx = ((e.clientX - rect.left) / rect.width) * 100;
-              //   const my = ((e.clientY - rect.top) / rect.height) * 100;
-              //   e.currentTarget.parentElement?.style.setProperty('--mx', `${mx}%`);
-              //   e.currentTarget.parentElement?.style.setProperty('--my', `${my}%`);
-              // }}
             />
           </div>
         </div>
