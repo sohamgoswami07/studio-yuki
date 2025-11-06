@@ -49,7 +49,7 @@ const Navbar = () => {
     <>
       <div
         ref={navRef}
-        className="absolute z-30 w-full h-auto top-0 left-0 py-8"
+        className="absolute z-30 w-full h-auto px-4 top-0 left-0 py-8"
       >
         <nav className="mx-auto max-w-6xl flex items-center justify-between">
           <Link to="/">

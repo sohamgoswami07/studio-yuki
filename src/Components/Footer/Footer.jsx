@@ -96,7 +96,7 @@ const Footer = () => {
               data-tilt-img
               src="/Logo/footer.svg"
               alt="Footer"
-              className="block max-w-4xl py-[120px] mx-auto"
+              className="block w-[90vw] md:w-full h-auto max-w-4xl py-32 md:py-[120px] mx-auto"
               style={{
                 transform: 'translate3d(0,0,0)',
                 transformStyle: 'preserve-3d',

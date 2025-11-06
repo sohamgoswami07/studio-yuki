@@ -55,13 +55,16 @@ const Booking = () => {
       {/* Booking */}
       <div className="bg-[#FF4C1B]" data-section="booking">
         <div className="max-w-6xl mx-auto py-24 space-y-10">
-          <h3 className="radio-canada-big heading px-24 text-center text-black">
+          <h3 className="radio-canada-big heading px-4 md:px-24 text-center text-black">
             We are the creative unit to partner with Brands that require
             distinctive creative experiences.
           </h3>
 
           {/* Embedded calendar section */}
-          <div className="h-[500px] w-full mx-auto overflow-hidden" id="my-cal-inline-30min"></div>
+          <div
+            className="h-auto w-auto mx-auto overflow-visible px-4 md:px-0"
+            id="my-cal-inline-30min"
+          ></div>
 
           {/* Email link */}
           {/* <div className="flex justify-center text-center">

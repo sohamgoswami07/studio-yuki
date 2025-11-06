@@ -222,6 +222,7 @@ const Home = () => {
               <div ref={buttonRef} className="mt-8 h-14">
                 <Link
                   to="https://cal.com/ranitdas/30min?overlayCalendar=true"
+                  target="_blank"
                   className="relative z-30 inline-flex items-center justify-center w-64 h-14 rounded-md bg-black button button-text text-white gap-2"
                 >
                   Let’s Create Together
